@@ -24,9 +24,9 @@ def macd hist_array, short, long, column = 4
 	
 	data = get_hist_column(hist_array, column)
 	#puts "data= #{data.size}"
-	b = data.moving_average(long)
+	b = data.exp_moving_average(long)
 	data.slice!(0, long-short)
-	a = data.moving_average(short)
+	a = data.exp_moving_average(short)
 	#puts "a= #{a.size}"
 	#puts "b= #{b.size}"
 

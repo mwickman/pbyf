@@ -40,6 +40,7 @@ class HistoricalQuote
     @data = PBYF.get_hist_quote str_of_stock, from_date, to_date, interval = 'd'
   end
 
+#get a column from the historical quotes CSV table
   def get_hist_column col
     hist_array = @data
     hist_array.slice!(0)
@@ -50,6 +51,25 @@ class HistoricalQuote
     end
     closings.collect! {|i| i.to_f} unless col == 0
     closings
+  end
+
+# calculates MACD using exponential moving averages
+  def macd short, long, column = 4    
+    data = get_hist_column(@data, column)
+    raise 'Your historical data array is too short!' if (data.size < long)
+
+    b = data.exp_moving_average(long)
+    data.slice!(0, long-short)
+    a = data.exp_moving_average(short)
+
+    i=0
+    result = []
+    a.each do |ele|
+      ele = ele - b[i]
+      result << ele
+      i+=1
+    end
+    result
   end
 
   private
