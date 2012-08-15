@@ -18,23 +18,23 @@ def get_hist_column hist_array, col
 end
 
 # This function is limited by the long parameter. It will return data starting at the date hist_array[long-1] 
-# or something like that anyway. Returns an array
+# or something like that anyway. Returns an array.
 def macd hist_array, short, long, column = 4
-	raise 'Your historical data array is too short!' if hist_array.size < long
+	raise 'Your historical data array is too short!' if (hist_array.size < long)
 	
 	data = get_hist_column(hist_array, column)
-	puts "data= #{data.size}"
+	#puts "data= #{data.size}"
 	b = data.moving_average(long)
 	data.slice!(0, long-short)
 	a = data.moving_average(short)
-	puts "a= #{a.size}"
-	puts "b= #{b.size}"
+	#puts "a= #{a.size}"
+	#puts "b= #{b.size}"
 
 	i=0
 	result = []
 	#a.collect {|ele| ele-b[i]}
 	a.each do |ele|
-		puts ele
+		#puts ele
 		ele = ele - b[i]
 		result << ele
 		i+=1
@@ -59,17 +59,38 @@ class Array
     	result
 	end
 
+	def exp_moving_average interval
+		return self.average if interval == 1
+		a = self.dup
+		result = []
+		result << a.moving_average(interval)[0]
+		k = 2/(interval.to_f+1)
+		#puts (a.size-interval)
+		#puts "start at previous avg= #{result[0]} and closing price= #{a[interval]} and k= #{k}"
+
+		(a.size-interval).times do |i|
+			ema = (a[i+interval]*k + result[i]*(1-k))
+			#puts "ema = #{ema}"
+			result << ema
+			#puts "i= #{i}  result[i]= #{result[i]}"
+		end
+		result
+	end
+
 	def average
 		r = (self.inject(:+)/self.size)
 	end
 end
-
-b = get_hist_column hist, 4
-puts b.inspect
-puts "size of column is #{b.size}"
-res = b.moving_average(5)
-mac = macd(hist, 5, 10)
+puts hist.size
+macd( hist, 2,3)
+#b = get_hist_column hist, 4
+#puts b.inspect
+#puts "size of column is #{b.size}"
+#res = b.moving_average(5)
+#mac = macd(hist, 5, 10)
 #arr = [1.0,2.0,3.0,4.0,5.0]
 #res = arr.moving_average(2)
-#puts "moving average is #{res.inspect}"
-puts "macd is #{ mac }"
+#puts "moving average is #{res}"
+#puts "macd is #{ mac }"
+#expoavg = b.exp_moving_average(5)
+#puts "exp avg = #{expoavg}"

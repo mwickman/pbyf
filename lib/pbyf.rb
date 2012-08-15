@@ -32,7 +32,60 @@ class PBYF
   end
   
 end
+
+#making a class to do calculations using the historical data from yahoo finance 
+class HistoricalQuote
   
-  #testing
-  #PBYF.get_quote('%40%5EDJI,GOOG', 'nsl1op')
-  #PBYF.get_hist_quote( 'GOOG', '3-19-2012', '4-19-2012', 'd' )
+  def initialize str_of_stock, from_date, to_date, interval = 'd'
+    @data = PBYF.get_hist_quote str_of_stock, from_date, to_date, interval = 'd'
+  end
+
+  def get_hist_column col
+    hist_array = @data
+    hist_array.slice!(0)
+    closings = []
+
+    hist_array.each do |a|
+      closings << a[col]
+    end
+    closings.collect! {|i| i.to_f} unless col == 0
+    closings
+  end
+
+  private
+
+  class Array
+    def moving_average interval
+      return self.average if interval == 1
+        a = self.dup
+        result = []
+        i=0
+        while(i <= a.size-interval)
+          data = a.slice(i,interval)
+          #puts "data= #{data}"
+          #puts "avg=  #{data.average}"
+          result << data.average
+          i+=1
+        end
+        result
+    end
+
+    def exp_moving_average interval
+      return self.average if interval == 1
+      a = self.dup
+      result = []
+      result << a.moving_average(interval)[0]
+      k = 2/(interval.to_f+1)
+
+      (a.size-interval).times do |i|
+        ema = (a[i+interval]*k + result[i]*(1-k))
+        result << ema
+      end
+      result
+    end
+
+    def average
+      r = (self.inject(:+)/self.size)
+    end
+  end
+end
