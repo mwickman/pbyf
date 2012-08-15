@@ -22,12 +22,12 @@ class PBYF
 
   # one cannot get multiple stocks for historical quotes, you must get them separately
   # for now dates will be assumed to be the format Month-Day-Year, i.e. 3-19-1988
+  #this should return an arrays of [Date, Open, High, Low, Close, Volume, Adj Close]
   def self.get_hist_quote str_of_stock, from_date, to_date, interval = 'd'
   	from = from_date.split('-')
   	to = to_date.split('-')
   	from_to_params = "&a=#{from[0].to_i-1}" + "&b=#{from[1]}" + "&c=#{from[2]}" + "&d=#{to[0].to_i-1}" + "&e=#{to[1]}" + "&f=#{to[2]}"
   	query_url = @@historical_quote_url + str_of_stock + from_to_params + "&g=#{interval}"
-  	puts query_url
   	arr_of_arrays = CSV.parse(RestClient.get query_url)
   end
   
