@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'PBYF'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.date        = '2012-08-14'
   s.summary     = "Still a work in progress"
   s.description = "For use with Yahoo Finance"

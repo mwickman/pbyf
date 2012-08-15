@@ -81,6 +81,8 @@ class Array
 		r = (self.inject(:+)/self.size)
 	end
 end
+
+
 puts hist.size
 macd( hist, 2,3)
 #b = get_hist_column hist, 4

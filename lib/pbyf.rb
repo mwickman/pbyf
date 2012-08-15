@@ -15,6 +15,7 @@ class PBYF
   # end
 
   #str_of_stocks should be formatted according to yahoo finance api docs
+  # might need to do work here on the formatting when multiple stocks are requested
   def self.get_quote str_of_stocks, str_of_options
   	query_url = @@quote_url + str_of_stocks + '&f=' + str_of_options
   	arr_of_arrays = CSV.parse(RestClient.get query_url)
@@ -33,17 +34,18 @@ class PBYF
   
 end
 
-#making a class to do calculations using the historical data from yahoo finance 
+#making a class to do calculations using the historical data from yahoo finance
+# maybe refactor so @high @low @close etc. columns are precalculated after initializing. Could be faster/cleaner, I dunno. 
 class HistoricalQuote
-  
+  @@col = {date: 0, open: 1, high: 2, low: 3, close: 4}
   def initialize str_of_stock, from_date, to_date, interval = 'd'
     @data = PBYF.get_hist_quote str_of_stock, from_date, to_date, interval = 'd'
+    @data.slice!(0)
   end
 
 #get a column from the historical quotes CSV table
   def get_hist_column col
     hist_array = @data
-    hist_array.slice!(0)
     closings = []
 
     hist_array.each do |a|
@@ -54,8 +56,8 @@ class HistoricalQuote
   end
 
 # calculates MACD using exponential moving averages
-  def macd short, long, column = 4    
-    data = get_hist_column(@data, column)
+  def macd short, long, column = @@col[:close]    
+    data = get_hist_column(column)
     raise 'Your historical data array is too short!' if (data.size < long)
 
     b = data.exp_moving_average(long)
@@ -72,9 +74,27 @@ class HistoricalQuote
     result
   end
 
-  private
+# this method should return an array of %K, with a value for every row of the data set (every date)
+  def find_k
+    # %K = (Current Close - Lowest Low)/(Highest High - Lowest Low) * 100
+    high = get_hist_column(@@col[:high])
+    low = get_hist_column(@@col[:low])
+    close = get_hist_column(@@col[:close])
+    result = []
 
-  class Array
+    close.each_index do |i|
+      result << ((close[i]-low[i])/(high[i]-low[i]))*100
+    end
+  end
+
+  # This is the 3 day exponential moving average of %K
+  def stochastic_oscillator
+    find_k.exp_moving_average(3)
+  end
+    
+end
+
+class Array
     def moving_average interval
       return self.average if interval == 1
         a = self.dup
@@ -108,4 +128,3 @@ class HistoricalQuote
       r = (self.inject(:+)/self.size)
     end
   end
-end
