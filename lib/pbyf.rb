@@ -32,7 +32,7 @@ end
 # maybe refactor so @high @low @close etc. columns are precalculated after initializing. Could be faster/cleaner, I dunno. 
 class HistoricalQuote
   attr_accessor :data, :close, :high, :low
-  @@col = {date: 0, open: 1, high: 2, low: 3, close: 4}
+  @@col = {date: 0, open: 1, high: 2, low: 3, close: 4, volume: 5}
 
   def initialize str_of_stock, from_date, to_date, interval = 'd'
     @data = PBYF.get_hist_quote str_of_stock, from_date, to_date, interval = 'd'

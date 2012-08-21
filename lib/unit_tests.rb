@@ -1,10 +1,27 @@
 require 'test/unit'
 require_relative 'pbyf'
 
+class Factory
+  
+  def self.testdata
+      arr = CSV.read('test_data.csv')
+      arr.slice!(0) #date period for this file is 1-03-2011 to 05-31-2011
+      arr
+  end
+
+  def self.get_col(col, array = [])
+    array = Factory.testdata
+    closings = array.map { |x| x[col] }
+    closings.collect! {|i| i.to_f} unless col == 0
+    closings.slice!(0,2) if col == 9
+    closings
+  end
+end
+
 #need more tests to make sure that these methods are returning the correct values, get some seed test data somehow
 class Testgem < Test::Unit::TestCase
     #initialize test data
-    @@googhist = HistoricalQuote.new('GOOG','7-15-2012','8-15-2012')
+    @@googhist = HistoricalQuote.new('GOOG','1-3-2011','5-31-2011') #don't change this date
 
     @@test1 = [21,20,25,27,30,25,27,36,27,29,21,23,30,39,40,38,36,33,31,36,39,43,41,44,44,45,43,50,52,48,55,45,33,40,56]
     @@test1exp4 = [23.25,25.95,25.57,26.142,30.0852,28.85112,28.910672,25.7464032,24.64784192,26.788705152,31.6732230912,35.0039338547,36.2023603128,36.1214161877,34.8728497126,33.3237098276,34.3942258965,36.2365355379,38.9419213228,39.7651527937,41.4590916762,42.4754550057,43.4852730034,43.2911638021,45.9746982812,48.3848189687,48.2308913812,50.9385348287,48.5631208972,42.3378725383,41.402723523,47.2416341138]
@@ -17,6 +34,11 @@ class Testgem < Test::Unit::TestCase
     @@test2exp5 = [22.18204,22.17,22.19,22.27,22.26,22.27,22.23,22.29,22.32,22.42,22.73,23.17,23.36,23.52,23.66,23.65,23.71,23.76,23.73,23.55,23.40,23.37,23.14,23.13,22.89,22.65]
     @@test2macd = [0.0470976543,0.0207090423,0.0411813725,0.0481855907,0.0838281588,0.2110527014,0.3731265306,0.3936288296,0.3929859121,0.3868785078,0.311948499,0.2807625245,0.2542663855,0.1912978014,0.0746453736,-0.0070526399,-0.0165816994,-0.1185774471,-0.1038280096,-0.1948084371,-0.2674760377]
     
+    @@test3 = Factory.get_col(4) #closings
+    @@test3K = Factory.get_col(8)
+    @@test3stoch = Factory.get_col(9)
+
+
     def testExpMovingAvg
         assert_equal @@test1exp4.map{|i| i.round(3)}, @@test1.exp_moving_average(4).map{|i| i.round(3)}
         assert_equal @@test1exp10.map{|i| i.round(3)}, @@test1.exp_moving_average(10).map{|i| i.round(3)}
@@ -36,10 +58,12 @@ class Testgem < Test::Unit::TestCase
 
     def testStochasticOscillator
         assert_instance_of Array, @@googhist.stochastic_oscillator
+        assert_equal @@test3stoch.map{|i| i.round(3)}, @@googhist.stochastic_oscillator.map{|i| i.round(3)}
     end
 
     def testFind_K
         assert_instance_of Array, @@googhist.find_k
+        assert_equal @@test3K.map{|i| i.round(3)}, @@googhist.find_k.map{|i| i.round(3)}
     end
 
 end
