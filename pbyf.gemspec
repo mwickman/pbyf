@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'pbyf'
-  s.version     = '0.0.2'
+  s.version     = '0.0.3'
   s.date        = '2012-08-14'
   s.summary     = "A gem for use with Yahoo Finance"
   s.description = "Use this gem to pull data from the Yahoo Finance site, and do some basic calculations with it."
