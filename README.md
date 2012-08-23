@@ -1,7 +1,7 @@
 pbyf
 ====
-
-Someone help me make this readme look pretty. Pretty please?
+The purpose of this gem is to interface with Yahoo Finance, and also do some basic stock related calculations.
+pbyf stands for Pause Break Yahoo Finance
 
 Basic Documentation
 ===================
@@ -11,10 +11,10 @@ Right now you get access to two classes, PBYF and HistoricalQuote
 
 # PBYF methods
     PBYF.get_quote str_of_stocks, str_of_options
-This method must be passed two strings, one being a correctly formatted string of Yahoo Finance stock symbols ('GOOG,BUD' will give google and budweiser stock arrays back). The second is a correctly formatted string of options ('nsl1op' should do something I think). Options are (here)[http://code.google.com/p/yahoo-finance-managed/wiki/enumQuoteProperty]. You will receive back an array of arrays with the data.
+This method must be passed two strings, one being a correctly formatted string of Yahoo Finance stock symbols ('GOOG,BUD' will give google and budweiser stock arrays back). The second is a correctly formatted string of options ('nsl1op' should do something I think). Options are [here](http://code.google.com/p/yahoo-finance-managed/wiki/enumQuoteProperty). You will receive back an array of arrays with the data.
 
     PBYF.get_hist_quote str_of_stock, from_date, to_date, interval
-Similar to above method, but can only do one stock at a time. Interval is like day, week, month. Dates should be string format like '4-22-2012'
+Similar to above method, but can only do one stock at a time. Interval is like day, week, month (passed as d, w, m,). Dates should be string format like '4-22-2012'
 
 # HistoricalQuote object
 HistoricalQuote is an object that is instantiated with 'HistoricalQuote.new(str_of_stock, from_date, to_date, interval = d)' similar to the method above
@@ -30,7 +30,7 @@ returns an array of the stocastic oscillator for the data set, beginning 3 days 
 returns an array of %K, which is used to calc the stochastic oscillator. Not sure if its useful for other things so it is a public method
 
 # New Array methods
-Some methods have been added to the Array class as well
+Some methods have been added to the Array class as well for using with your stock data
     macd(short, long)
 returns the Moving Average Convergence Divergence, using the exponential moving average of the data. This is set to using closing data by default if you leave out the column parameter.
 
@@ -42,3 +42,6 @@ Like the above but for simple moving averages
 
     average
 This returns an average of all elements in the array as a float
+
+    macd(short,long)
+Returns an array with all the MACD, starting wit the element array[long]. You pass the short exponential moving average interval and the long exponential moving average interval

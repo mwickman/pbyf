@@ -17,7 +17,7 @@ class PBYF
 
   # one cannot get multiple stocks for historical quotes, you must get them separately
   # for now dates will be assumed to be the format Month-Day-Year, i.e. 3-19-1988
-  #this should return an arrays of [Date, Open, High, Low, Close, Volume, Adj Close]
+  #this should return an array of arrays of [Date, Open, High, Low, Close, Volume, Adj Close]
   def self.get_hist_quote str_of_stock, from_date, to_date, interval = 'd'
     from = from_date.split('-')
     to = to_date.split('-')
@@ -31,7 +31,7 @@ end
 # making a class to do calculations using the historical data from yahoo finance
 # maybe refactor so @high @low @close etc. columns are precalculated after initializing. Could be faster/cleaner, I dunno. 
 class HistoricalQuote
-  attr_accessor :data, :close, :high, :low
+  attr_accessor :close, :high, :low, :stochastic
   @@col = {date: 0, open: 1, high: 2, low: 3, close: 4, volume: 5}
 
   def initialize str_of_stock, from_date, to_date, interval = 'd'
@@ -40,6 +40,12 @@ class HistoricalQuote
     @close = get_hist_column(@@col[:close])
     @high = get_hist_column(@@col[:high])
     @low = get_hist_column(@@col[:low])
+    @stochastic = @close.stochastic_oscillator
+  end
+
+  def get_data_from date
+    #stuff here
+    # return macd, stoch oscillator, high, low, and close for a specific date
   end
 
   #get a column from the historical quotes CSV table
@@ -47,17 +53,6 @@ class HistoricalQuote
     closings = @data.map { |x| x[col] }
     closings.collect! {|i| i.to_f} unless col == 0
     closings
-  end
-
-  # get a better name for this
-  def diffavg interval=20
-    result =[]
-    mvgavg = @data.moving_average(interval)
-
-    @close.each_index do |i| 
-      result << (@close[i] - mvavg[i])
-    end
-    result
   end
 
   # this method should return an array of %K, with a value for every row of the data set (every date)
@@ -82,6 +77,18 @@ class HistoricalQuote
 end
 
 class Array
+
+    # measures diference between closing value and moving average. Defaults to 20 but use whatever you want
+  def pvma interval=20
+    array = self
+    result =[]
+    mvgavg = self.moving_average(interval)
+
+    @close.each_index do |i| 
+      result << (@close[i] - mvavg[i])
+    end
+    result
+  end
 
   def macd short, long    
     data = self
