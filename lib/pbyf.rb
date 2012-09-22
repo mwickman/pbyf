@@ -40,7 +40,7 @@ class HistoricalQuote
     @close = get_hist_column(@@col[:close])
     @high = get_hist_column(@@col[:high])
     @low = get_hist_column(@@col[:low])
-    @stochastic = @close.stochastic_oscillator
+    @stochastic = self.stochastic_oscillator
   end
 
   def get_data_from date
